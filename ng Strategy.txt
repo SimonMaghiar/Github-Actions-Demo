@@ -1,0 +1,25 @@
+ //@version=4
+strategy("Heikin Ashi Color Change Strategy", overlay=true)
+
+// Define inputs
+timeframe_input = input(title="Timeframe", type=input.resolution, defval="D")
+color_change_threshold = input(title="Color Change Threshold", type=input.float, defval=2.0, minval=0.1)
+
+// Define Heikin Ashi candles
+ha_open = security(syminfo.tickerid, timeframe_input, open)
+ha_close = security(syminfo.tickerid, timeframe_input, close)
+ha_high = security(syminfo.tickerid, timeframe_input, high)
+ha_low = security(syminfo.tickerid, timeframe_input, low)
+
+// Define color change condition
+color_change = abs(ha_close - ha_open) >= color_change_threshold * syminfo.mintick
+
+// Define long and short signals
+long_signal = color_change and ha_close > ha_open
+short_signal = color_change and ha_close < ha_open
+
+// Submit long and short orders
+if (long_signal)
+    strategy.entry("Long", strategy.long)
+if (short_signal)
+    strategy.entry("Short", strategy.short)
